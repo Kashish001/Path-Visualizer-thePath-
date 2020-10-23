@@ -1,0 +1,49 @@
+body {
+    padding-top: 80px;
+    height: 100%;
+}
+
+ul {
+    list-style-type: none;
+}
+
+.btn-space {
+    margin-right: 5px;
+}
+.key {
+	border: 1px solid #79d9ce;
+	width: 25px;
+    height: 25px;
+    margin-right: 10px;
+}
+.start {
+    background-image: url("triangletwo-right.svg");
+    border-color: white;
+}
+
+.end {
+    background-image: url("spaceshiptwo-left.svg");
+    border-color: white;
+}
+
+.wall {
+	transition : background-color 0.1s ease-in-out;
+	background-color: #262b28;
+	border-color: #262b28;
+}
+
+.visited {
+	transition : background-color 0.08s ease-in-out;
+	background-color:rgba(0, 190, 218, 0.75);
+	border-color:rgba(0, 190, 218, 0.75);
+}
+.searching {
+	transition : background-color 0.08s ease-in-out;
+	background-color: rgba(178, 67, 255, 0.75);
+	border-color: rgba(178, 67, 255, 0.75);
+}
+.success {
+	transition : background-color 0.08s ease-in-out;
+	background-color: #e4990f;
+	border-color: #e4990f;
+}
