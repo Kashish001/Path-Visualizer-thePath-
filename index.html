@@ -20,9 +20,10 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-	    	<ul class="navbar-nav mr-auto">
-		      	<li class="nav-item dropdown" id="mazes">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown" id="mazes">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Maze Generation
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -32,7 +33,8 @@
                     </div>
                 </li>
                 <li class="nav-item dropdown" id="algorithms">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Algorithm to be Visualized
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -41,7 +43,8 @@
                     </div>
                 </li>
                 <li class="nav-item dropdown" id="speed">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Visualization Speed : Fast
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -52,10 +55,12 @@
                 </li>
             </ul>
             <button class="btn btn-outline-success btn-space" type="submit" id="startBtn">Start Visualization</button>
-	      	<button type="button" class="btn btn-outline-warning btn-space" type="submit" id="clearBtn">Clear Maze</button>
+            <button type="button" class="btn btn-outline-warning btn-space" type="submit" id="clearBtn">Clear
+                Maze</button>
         </div>
     </nav>
-    <div class="d-flex flex-row flex-wrap m-2 justify-content-around"> 
+
+    <div class="d-flex flex-row flex-wrap m-2 justify-content-around">
         <div class="d-flex p-2">
             <div class="key start"></div>
             <div>Start</div>
@@ -69,8 +74,8 @@
             <div>Hurdle / Wall</div>
         </div>
         <div class="d-flex p-2">
-            <div class="key searching"></div>  
-            <div class="key visited"></div>  
+            <div class="key searching"></div>
+            <div class="key visited"></div>
             <div>Visited</div>
         </div>
         <div class="d-flex p-2">
@@ -78,13 +83,26 @@
             <div>Shortest Path</div>
         </div>
         <div class="d-flex p-2">
-            <div class="key"></div>  
+            <div class="key"></div>
             <div>Unvisited</div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <div class="d-flex flex-column align-items-center" id="bigTableContainer">
+        <div id="tableContainer"></div>
+    </div>
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script type = "text/javascript" src="Backend/index.js"></script>
+    
 </body>
 
 </html>
