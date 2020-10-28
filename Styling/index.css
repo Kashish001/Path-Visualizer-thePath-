@@ -18,12 +18,24 @@ ul {
 }
 .start {
     background-image: url("triangletwo-right.svg");
+    background-size: contain;
+}
+
+.startT {
+    background-image: url("triangletwo-right.svg");
+    background-size: contain;
     border-color: white;
 }
 
 .end {
     background-image: url("spaceshiptwo-left.svg");
+    background-size: contain;
+}
+
+.endT {
+    background-image: url("spaceshiptwo-left.svg");
     border-color: white;
+    background-size: contain;
 }
 
 .wall {
