@@ -1,109 +1,196 @@
-
 var totalRows = 40;
 var totalCols = 62;
-var speed = "Fast";
-var algorithmChoosed;
-var createWalls = false;
-var startCell = [0, 61];
-var endCell = [39, 0];
 var inProgress = false;
-var finished = false;
+var cellsToAnimate = [];
+var createWalls = false;
+var algorithm = null;
+var justFinished = false;
+var animationSpeed = "Fast";
+var animationState = null;
+var startCell = [1, 60];
+var endCell = [38, 1];
+var movingStart = false;
+var movingEnd = false;
 
-
-
-function createMaze(rows, cols) {
-    var maze = "<table>";
-    for(row = 1; row <= rows; row++) {
-        maze += "<tr>"
-        for(col = 1; col <= cols; col++) {
-            maze += "<td></td>"
+function generateGrid( rows, cols ) {
+    var grid = "<table>";
+    for ( row = 1; row <= rows; row++ ) {
+        grid += "<tr>"; 
+        for ( col = 1; col <= cols; col++ ) {      
+            grid += "<td></td>";
         }
-        maze += "</tr>";
+        grid += "</tr>"; 
     }
-    maze += "</table>";
-    return maze;
+    grid += "</table>"
+    return grid;
 }
 
-var myMaze = createMaze(totalRows, totalCols);
-$("#tableContainer").append(myMaze);
+var myGrid = generateGrid( totalRows, totalCols);
+$( "#tableContainer" ).append( myGrid );
 
-//Nav Bar Backend
+/* --------------------------- */
+/* --- OBJECT DECLARATIONS --- */
+/* --------------------------- */
 
-$("#mazes .dropdown-item").click(function() {
-
-});
-
-$("#speed .dropdown-item").click(function() {
-    speed = $(this).text();
-    updateDisplayedSpeed();
-});
-
-$("#algorithm .dropdown-item").click(function() {
-    algorithmChoosed = $(this).text();
-    updateAlgo();
-});
-
-$("td").click(function() {
-    var index = $("td").index(this);
-    var startIndex = (startCell[0] * (totalCols)) + startCell[1];
-    var endIndex = (endCell[0] * (totalCols)) + endCell[1];
-    if(!inProgress && !(index == startIndex) && !(index == endIndex)) {
-        if(finished) {
-            clearMaze(keepWalls = true);
-            finished = false;
-        }
-        $(this).toggleClass("wall");
-    }
-});
-
-$("#clearBtn").click(function() {
-    if (inProgress){ return; }
-	clearMaze(keepWalls = false);
-});
-
-$("td").mouseup(function() {
-
-});
-
-
-
-//Functions
-
-function updateDisplayedSpeed() {
-    if(speed == "Fast") $(".displayedSpeed").text("Visualization Speed: Fast");
-    else if(speed == "Slow") $(".displayedSpeed").text("Visualization Speed: Slow");
-    else if(speed == "Normal") $(".displayedSpeed").text("Visualization Speed: Normal");
-    return ;
+function Queue() { 
+ this.stack = new Array();
+ this.dequeue = function(){
+  	return this.stack.pop(); 
+ } 
+ this.enqueue = function(item){
+  	this.stack.unshift(item);
+  	return;
+ }
+ this.empty = function(){
+ 	return ( this.stack.length == 0 );
+ }
+ this.clear = function(){
+ 	this.stack = new Array();
+ 	return;
+ }
 }
 
+/* ------------------------- */
+/* ---- MOUSE FUNCTIONS ---- */
+/* ------------------------- */
 
-function updateAlgo() {
-    if(algorithmChoosed == "BFS (Breadth First Search)") $(".algo").text("Algorithm: BFS (Breadth First Search)");
-    else if(algorithmChoosed == "DFS (Depth First Search)") $(".algo").text("Algorithm: DFS (Depth First Search)");
-    return ;
-}
-
-function clearMaze( keepWalls ){
-	var cells = $("#tableContainer").find("td");
+$( "td" ).mousedown(function(){
+	var index = $( "td" ).index( this );
 	var startCellIndex = (startCell[0] * (totalCols)) + startCell[1];
 	var endCellIndex = (endCell[0] * (totalCols)) + endCell[1];
-	for (var i = 0; i < cells.length; i++){
-			isWall = $( cells[i] ).hasClass("wall");
-			$( cells[i] ).removeClass();
-			if (i == startCellIndex){
-				$(cells[i]).addClass("start"); 
-			} else if (i == endCellIndex){
-				$(cells[i]).addClass("end"); 
-			} else if ( keepWalls && isWall ){ 
-				$(cells[i]).addClass("wall"); 
-			}
+	if ( !inProgress ){
+		if ( justFinished  && !inProgress ){ 
+			clearBoard( keepWalls = true ); 
+			justFinished = false;
+		}
+		if (index == startCellIndex){
+			movingStart = true;
+		} else if (index == endCellIndex){
+			movingEnd = true;
+		} else {
+			createWalls = true;
+		}
 	}
+});
+
+$( "td" ).mouseup(function(){
+	createWalls = false;
+	movingStart = false;
+	movingEnd = false;
+});
+
+$( "td" ).mouseenter(function() {
+	if (!createWalls && !movingStart && !movingEnd){ return; }
+    var index = $( "td" ).index( this );
+    var startCellIndex = (startCell[0] * (totalCols)) + startCell[1];
+	var endCellIndex = (endCell[0] * (totalCols)) + endCell[1];
+    if (!inProgress){
+    	if (justFinished){ 
+    		clearBoard( keepWalls = true );
+    		justFinished = false;
+    	}
+
+    	if (movingStart && index != endCellIndex) {
+    		moveStartOrEnd(startCellIndex, index, "start");
+    	} else if (movingEnd && index != startCellIndex) {
+    		moveStartOrEnd(endCellIndex, index, "end");
+    	} else if (index != startCellIndex && index != endCellIndex) {
+    		$(this).toggleClass("wall");
+    	}
+    }
+});
+
+$( "td" ).click(function() {
+    var index = $( "td" ).index( this );
+    var startCellIndex = (startCell[0] * (totalCols)) + startCell[1];
+	var endCellIndex = (endCell[0] * (totalCols)) + endCell[1];
+    if ((inProgress == false) && !(index == startCellIndex) && !(index == endCellIndex)){
+    	if ( justFinished ){ 
+    		clearBoard( keepWalls = true );
+    		justFinished = false;
+    	}
+    	$(this).toggleClass("wall");
+    }
+});
+
+$( "body" ).mouseup(function(){
+	createWalls = false;
+	movingStart = false;
+	movingEnd = false;
+});
+
+/* ----------------- */
+/* ---- BUTTONS ---- */
+/* ----------------- */
+
+$( "#startBtn" ).click(function(){
+    if ( algorithm == null ){ return;}
+    if ( inProgress ){ update("wait"); return; }
+	traverseGraph(algorithm);
+});
+
+$( "#clearBtn" ).click(function(){
+    if ( inProgress ){ update("wait"); return; }
+	clearBoard(keepWalls = false);
+});
+
+
+/* --------------------- */
+/* --- NAV BAR MENUS --- */
+/* --------------------- */
+
+$( "#algorithms .dropdown-item").click(function(){
+	if ( inProgress ){ update("wait"); return; }
+	algorithm = $(this).text();
+	updatealgo();
+});
+
+$( "#speed .dropdown-item").click(function(){
+	if ( inProgress ){ update("wait"); return; }
+	animationSpeed = $(this).text();
+	updateSpeedDisplay();
+});
+
+$( "#mazes .dropdown-item").click(function(){
+	if ( inProgress ){ update("wait"); return; }
+	maze = $(this).text();
+	if (maze == "Random"){
+		randomMaze();
+	} 
+});
+
+/* ----------------- */
+/* --- FUNCTIONS --- */
+/* ----------------- */
+
+function moveStartOrEnd(prevIndex, newIndex, startOrEnd){
+	var newCellY = newIndex % totalCols;
+	var newCellX = Math.floor((newIndex - newCellY) / totalCols);
+	if (startOrEnd == "start"){
+    	startCell = [newCellX, newCellY];
+    } else {
+    	endCell = [newCellX, newCellY];
+    }
+    clearBoard(keepWalls = true);
+    return;
 }
 
+function updateSpeedDisplay(){
+	if (animationSpeed == "Slow"){
+		$(".speedDisplay").text("Visualization Speed: Slow");
+	} else if (animationSpeed == "Visualization Speed: Normal"){
+		$(".speedDisplay").text("Visualization Speed: Normal");
+	} else if (animationSpeed == "Fast"){
+		$(".speedDisplay").text("Visualization Speed: Fast");
+	}
+	return;
+}
 
-//Mouse Events
-
-
-
-
-clearMaze();
+function updatealgo(){
+	if (algorithm == "DFS (Depth First Search)"){
+		$(".algo").text("DFS (Depth First Search)");
+	} else if (algorithm == "BFS (Breadth First Search)"){
+		$(".algo").text("BFS (Breadth First Search)");
+	}
+	return;
+}
