@@ -194,3 +194,82 @@ function updatealgo(){
 	}
 	return;
 }
+
+async function traverseGraph(algorithm){
+    inProgress = true;
+	clearBoard( keepWalls = true );
+	var pathFound = executeAlgo();
+	await animateCells();
+	if ( pathFound ){ 
+		alert("Path Found")
+	} else {
+		alert("Path Not Found");
+	}
+	inProgress = false;
+	justFinished = true;
+}
+
+function executeAlgo(){
+	if (algorithm == "DFS (Depth First Search)"){
+		var visited = createVisited();
+		var pathFound = DFS(startCell[0], startCell[1], visited);
+	} else if (algorithm == "BFS (Breadth First Search)"){
+		var pathFound = BFS();
+	}
+	return pathFound;
+}
+
+
+function DFS(i, j, visited){
+	if (i == endCell[0] && j == endCell[1]){
+		cellsToAnimate.push( [[i, j], "success"] );
+		return true;
+	}
+	visited[i][j] = true;
+	cellsToAnimate.push( [[i, j], "searching"] );
+	var neighbors = getNeighbors(i, j);
+	for(var k = 0; k < neighbors.length; k++){
+		var m = neighbors[k][0];
+		var n = neighbors[k][1]; 
+		if ( !visited[m][n] ){
+			var pathFound = DFS(m, n, visited);
+			if ( pathFound ){
+				cellsToAnimate.push( [[i, j], "success"] );
+				return true;
+			} 
+		}
+	}
+	cellsToAnimate.push( [[i, j], "visited"] );
+	return false;
+}
+
+
+function getNeighbors(i, j){
+	var neighbors = [];
+	if ( i > 0 ){ neighbors.push( [i - 1, j] );}
+	if ( j > 0 ){ neighbors.push( [i, j - 1] );}
+	if ( i < (totalRows - 1) ){ neighbors.push( [i + 1, j] );}
+	if ( j < (totalCols - 1) ){ neighbors.push( [i, j + 1] );}
+	return neighbors;
+}
+
+
+function clearBoard( keepWalls ){
+	var cells = $("#tableContainer").find("td");
+	var startCellIndex = (startCell[0] * (totalCols)) + startCell[1];
+	var endCellIndex = (endCell[0] * (totalCols)) + endCell[1];
+	for (var i = 0; i < cells.length; i++){
+			isWall = $( cells[i] ).hasClass("wall");
+			$( cells[i] ).removeClass();
+			if (i == startCellIndex){
+				$(cells[i]).addClass("start"); 
+			} else if (i == endCellIndex){
+				$(cells[i]).addClass("end"); 
+			} else if ( keepWalls && isWall ){ 
+				$(cells[i]).addClass("wall"); 
+			}
+	}
+}
+
+// Ending statements
+clearBoard();
