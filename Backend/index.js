@@ -89,7 +89,6 @@ $( "td" ).mouseenter(function() {
     		clearBoard( keepWalls = true );
     		justFinished = false;
     	}
-
     	if (movingStart && index != endCellIndex) {
     		moveStartOrEnd(startCellIndex, index, "start");
     	} else if (movingEnd && index != startCellIndex) {
@@ -236,6 +235,11 @@ function createVisited(){
 	return visited;
 }
 
+function cellIsAWall(i, j, cells){
+	var cellNum = (i * (totalCols)) + j;
+	return $(cells[cellNum]).hasClass("wall");
+}
+
 function DFS(i, j, visited){
 	if (i == endCell[0] && j == endCell[1]){
 		cellsToAnimate.push( [[i, j], "success"] );
@@ -258,6 +262,7 @@ function DFS(i, j, visited){
 	cellsToAnimate.push( [[i, j], "visited"] );
 	return false;
 }
+
 
 function BFS(){
 	var pathFound = false;
@@ -310,6 +315,69 @@ function BFS(){
 	return pathFound;
 }
 
+async function randomMaze(){
+	inProgress = true;
+	clearBoard(keepWalls = false);
+	var visited = createVisited();
+	var walls = makeWalls();
+	var cells = [ startCell, endCell ];
+	walls [ startCell[0] ][ startCell[1] ] = false;
+	walls [ endCell[0] ][ endCell[1] ] = false;
+	visited[ startCell[0] ][ startCell[1] ] = true;
+	visited[ endCell[0] ][ endCell[1] ] = true;
+	while ( cells.length > 0 ){
+		var random = Math.floor(Math.random() * cells.length);
+		var randomCell = cells[random];
+		cells[random] = cells[cells.length - 1];
+		cells.pop();
+		var neighbors = getNeighbors(randomCell[0], randomCell[1]);
+		if (neighborsThatAreWalls(neighbors, walls) < 2){ continue; }
+		walls[ randomCell[0] ][ randomCell[1] ] = false;
+		for (var k = 0; k < neighbors.length; k++){
+			var i = neighbors[k][0];
+			var j = neighbors[k][1];
+			if (visited[i][j]){ continue; }
+			visited[i][j] = true;
+			cells.push([i, j]);
+		}
+	}
+	//Animate cells
+	var cells = $("#tableContainer").find("td");
+	for (var i = 0; i < totalRows; i++){
+		for (var j = 0; j < totalCols; j++){
+			if (i == 0 || i == (totalRows - 1) || j == 0 || j == (totalCols - 1) || walls[i][j]){ 
+				cellsToAnimate.push([ [i, j], "wall"]); 
+			}
+		}
+	}
+	await animateCells();
+	inProgress = false;
+	return;
+}
+
+
+function makeWalls(){
+	var walls = [];
+	for (var i = 0; i < totalRows; i++){
+		var row = [];
+		for (var j = 0; j < totalCols; j++){
+			row.push(true);
+		}
+		walls.push(row);
+	}
+	return walls;
+}
+
+function neighborsThatAreWalls( neighbors, walls ){
+	var neighboringWalls = 0;
+	for (var k = 0; k < neighbors.length; k++){
+		var i = neighbors[k][0];
+		var j = neighbors[k][1];
+		if (walls[i][j]) { neighboringWalls++; }
+	}
+	return neighboringWalls;
+}
+
 function createPrev(){
 	var prev = [];
 	for (var i = 0; i < totalRows; i++){
@@ -322,8 +390,6 @@ function createPrev(){
 	return prev;
 }
 
-
-
 function getNeighbors(i, j){
 	var neighbors = [];
 	if ( i > 0 ){ neighbors.push( [i - 1, j] );}
@@ -333,6 +399,54 @@ function getNeighbors(i, j){
 	return neighbors;
 }
 
+async function animateCells(){
+	animationState = null;
+	var cells = $("#tableContainer").find("td");
+	var startCellIndex = (startCell[0] * (totalCols)) + startCell[1];
+	var endCellIndex = (endCell[0] * (totalCols)) + endCell[1];
+	var delay = getDelay();
+	for (var i = 0; i < cellsToAnimate.length; i++){
+		var cellCoordinates = cellsToAnimate[i][0];
+		var x = cellCoordinates[0];
+		var y = cellCoordinates[1];
+		var num = (x * (totalCols)) + y;
+		if (num == startCellIndex || num == endCellIndex){ continue; }
+		var cell = cells[num];
+		var colorClass = cellsToAnimate[i][1];
+
+		// Wait until its time to animate
+		await new Promise(resolve => setTimeout(resolve, delay));
+
+		$(cell).removeClass();
+		$(cell).addClass(colorClass);
+	}
+	cellsToAnimate = [];
+	return new Promise(resolve => resolve(true));
+}
+
+function getDelay(){
+    var delay;
+	if (animationSpeed === "Slow"){
+		if (algorithm == "Depth-First Search (DFS)") {
+			delay = 25;
+		} else {
+			delay = 20;
+		}
+	} else if (animationSpeed === "Normal") {
+		if (algorithm == "Depth-First Search (DFS)") {
+			delay = 15;
+		} else {
+			delay = 10;
+		}
+	} else if (animationSpeed == "Fast") {
+		if (algorithm == "Depth-First Search (DFS)") {
+			delay = 10;
+		} else {
+			delay = 5;
+		}
+	}
+	return delay;
+}
 
 function clearBoard( keepWalls ){
 	var cells = $("#tableContainer").find("td");
