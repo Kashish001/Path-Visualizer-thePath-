@@ -123,7 +123,7 @@ $( "body" ).mouseup(function(){
 /* ----------------- */
 
 $( "#startBtn" ).click(function(){
-    if ( algorithm == null ){ return;}
+    if ( algorithm == null ){ alert("Please Choose Any Algorithm"); return;}
     if ( inProgress ){ update("wait"); return; }
 	traverseGraph(algorithm);
 });
